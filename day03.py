@@ -37,40 +37,27 @@ def part2(input):
     for [line] in read_input(3, input, [(str,)]):
         lines.append(sorted(line))
         if len(lines) == 3:
-            a, b, c = lines
             largest = 'A'
-            index_a = 0
-            index_b = 0
-            index_c = 0
-            value_a = a[index_a]
-            if value_a > largest:
-                largest = value_a
-            value_b = b[index_b]
-            if value_b > largest:
-                largest = value_b
-            value_c = c[index_c]
-            if value_c > largest:
-                largest = value_c
-            while index_a < len(a) and index_b < len(b) and index_c < len(c):
-                if value_a == value_b and value_a == value_c:
+            indices = [0] * 3
+            values = [0] * 3
+
+            for i in range(3):
+                values[i] = lines[i][indices[i]]
+                if lines[i][indices[i]] > largest:
+                    largest = lines[i][indices[i]]
+
+            while all([index < len(line) for index, line in zip(indices, lines)]):
+                if all(value == values[0] for value in values[1:]):
                     break
                 else:
-                    if value_a < largest:
-                        index_a += 1
-                        value_a = a[index_a]
-                        if value_a > largest:
-                            largest = value_a
-                    if value_b < largest:
-                        index_b += 1
-                        value_b = b[index_b]
-                        if value_b > largest:
-                            largest = value_b
-                    if value_c < largest:
-                        index_c += 1
-                        value_c = c[index_c]
-                        if value_c > largest:
-                            largest = value_c
-            total += priority(value_a)
+                    for i in range(3):
+                        if values[i] < largest:
+                            indices[i] += 1
+                            values[i] = lines[i][indices[i]]
+                            if values[i] > largest:
+                                largest = values[i]
+
+            total += priority(values[0])
             lines = []
     return total
 
