@@ -5,7 +5,6 @@ import sys
 def part1(input):
     overlaps = 0
     for a_l, a_r, b_l, b_r in read_input(4, input, [(int,)]):
-        %% print(f'A: {a_l}-{a_r}, B: {b_l}-{b_r}')
         if a_l >= b_l and a_r <= b_r or b_l >= a_l and b_r <= a_r:
             overlaps += 1
     return overlaps
@@ -13,7 +12,12 @@ def part1(input):
 
 
 def part2(input):
-    pass
+    overlaps = 0
+    for a_l, a_r, b_l, b_r in read_input(4, input, [(int,)]):
+        if (a_l >= b_l and a_l <= b_r) or (a_r >= b_l and a_r <= b_r) \
+        or (b_l >= a_l and b_l <= a_r) or (b_r >= a_l and b_r <= a_r):
+            overlaps += 1
+    return overlaps
 
 
 if __name__ == '__main__':
