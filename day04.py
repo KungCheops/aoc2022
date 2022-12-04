@@ -14,8 +14,7 @@ def part1(input):
 def part2(input):
     overlaps = 0
     for a_l, a_r, b_l, b_r in read_input(4, input, [(int,)]):
-        if (a_l >= b_l and a_l <= b_r) or (a_r >= b_l and a_r <= b_r) \
-        or (b_l >= a_l and b_l <= a_r) or (b_r >= a_l and b_r <= a_r):
+        if a_r >= b_l and b_r >= a_l:
             overlaps += 1
     return overlaps
 
