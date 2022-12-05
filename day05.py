@@ -21,22 +21,16 @@ def parse_input(lines):
 def part1(input):
     bucket, instructions = parse_input(list(read_input_simple(5, input, False)))
     for amount, source, target in instructions:
-        # print(f'Moving {amount} box(es) from {source} to {target}.')
-        # print(f'Before: {bucket}')
         bucket[target - 1] = list(reversed(bucket[source - 1][:amount])) + bucket[target - 1]
         bucket[source - 1] = bucket[source - 1][amount:]
-        # print(f'After:  {bucket}')
     return ''.join([b[0] for b in bucket])
 
 
 def part2(input):
     bucket, instructions = parse_input(list(read_input_simple(5, input, False)))
     for amount, source, target in instructions:
-        # print(f'Moving {amount} box(es) from {source} to {target}.')
-        # print(f'Before: {bucket}')
         bucket[target - 1] = bucket[source - 1][:amount] + bucket[target - 1]
         bucket[source - 1] = bucket[source - 1][amount:]
-        # print(f'After:  {bucket}')
     return ''.join([b[0] for b in bucket])
 
 
