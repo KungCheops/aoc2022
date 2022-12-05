@@ -22,7 +22,10 @@ def read_input(day, part, fun_and_args):
                 yield typed_split_line
 
 
-def read_input_simple(day, part):
+def read_input_simple(day, part, strip=True):
     with open(f'input/day{day:02d}_{part}.txt') as file:
         for line in file:
-            yield line.strip()
+            if strip:
+                yield line.strip()
+            else:
+                yield line[:-1]
