@@ -4,19 +4,19 @@ from collections import defaultdict
 from queue import Queue
 
 
-cache = dict()
+sizes_cache = dict()
 
 
 def folder_size(folder, folder_structure):
-    if folder in cache:
-        return cache[folder]
+    if folder in sizes_cache:
+        return sizes_cache[folder]
     size = 0
     for a, b in folder_structure[folder]:
         if a == 'dir':
             size += folder_size(b, folder_structure)
         else:
             size += b
-    cache[folder] = size
+    sizes_cache[folder] = size
     return size
 
 
