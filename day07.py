@@ -64,7 +64,7 @@ def part2(input):
     needed_free_space = 30000000
     total_used_size = folder_size('', folder_structure)
     need_to_remove = needed_free_space - disk_size + total_used_size
-    smallest_large_folder_size = disk_size
+    smallest_large_folder_size = total_used_size
     for folder in all_folders:
         this_folder_size = folder_size(folder, folder_structure)
         if this_folder_size >= need_to_remove and this_folder_size < smallest_large_folder_size:
