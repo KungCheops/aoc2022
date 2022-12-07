@@ -24,16 +24,14 @@ def folder_to_str(folder):
     return '/'.join(folder)
 
 
-def part1(input):
+def create_structure(input):
     current_folder = []
     folder_structure = defaultdict(list)
     all_folders = {''}
     for line in read_input_simple(7, input):
         split_line = line.split()
         if split_line[0] == '$':
-            if split_line[1] == 'ls':
-                continue
-            elif split_line[1] == 'cd':
+            if split_line[1] == 'cd':
                 if split_line[2] == '..':
                     current_folder = current_folder[:-1]
                 elif split_line[2] == '/':
@@ -47,6 +45,11 @@ def part1(input):
                 all_folders.add(folder_to_str(new_folder))
             else:
                 folder_structure[folder_to_str(current_folder)].append((folder_to_str(new_folder), int(split_line[0])))
+    return folder_structure, all_folders
+
+
+def part1(input):
+    folder_structure, all_folders = create_structure(input)
     small_folders_sum = 0
     for folder in all_folders:
         this_folder_size = folder_size(folder, folder_structure)
@@ -56,28 +59,7 @@ def part1(input):
 
 
 def part2(input):
-    current_folder = []
-    folder_structure = defaultdict(list)
-    all_folders = {''}
-    for line in read_input_simple(7, input):
-        split_line = line.split()
-        if split_line[0] == '$':
-            if split_line[1] == 'ls':
-                continue
-            elif split_line[1] == 'cd':
-                if split_line[2] == '..':
-                    current_folder = current_folder[:-1]
-                elif split_line[2] == '/':
-                    current_folder = ['']
-                else:
-                    current_folder.append(split_line[2])
-        else:
-            new_folder = current_folder + [split_line[1]]
-            if split_line[0] == 'dir':
-                folder_structure[folder_to_str(current_folder)].append(('dir', folder_to_str(new_folder)))
-                all_folders.add(folder_to_str(new_folder))
-            else:
-                folder_structure[folder_to_str(current_folder)].append((folder_to_str(new_folder), int(split_line[0])))
+    folder_structure, all_folders = create_structure(input)
     disk_size = 70000000
     needed_free_space = 30000000
     total_used_size = folder_size('', folder_structure)
