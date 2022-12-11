@@ -2,6 +2,7 @@ from helper.input import read_input_simple
 import sys
 from queue import Queue
 import operator
+from functools import reduce
 
 
 ops = {'+': operator.add, '*': operator.mul}
@@ -23,13 +24,15 @@ class Monkey:
         return not self.items.empty()
 
 
-    def get_next(self):
+    def get_next(self, reduce_worry):
         next_item = self.items.get()
         if self.operand == 'old':
             operand = next_item
         else:
             operand = int(self.operand)
-        new_worry_level = self.operator(next_item, operand) // 3
+        new_worry_level = self.operator(next_item, operand)
+        if reduce_worry:
+            new_worry_level // 3
         if new_worry_level % self.divisor == 0:
             target_monkey = self.true_target
         else:
@@ -56,6 +59,7 @@ class Monkey:
 
 def parse_input(input):
     monkeys = []
+    divisors = []
     
     for line_number, line in enumerate(read_input_simple(11, input)):
         match line_number % 7:
@@ -70,6 +74,7 @@ def parse_input(input):
                 operand = line.split()[5]
             case 3:
                 divisor = int(line.split()[3])
+                divisors.append(divisor)
             case 4:
                 true_target = int(line.split()[5])
             case 5:
@@ -78,17 +83,16 @@ def parse_input(input):
                 # print(monkey_id, monkey_items, operator, operand, divisor, true_target, false_target)
                 monkeys.append(Monkey(monkey_id, monkey_items, operator, operand, divisor, true_target, false_target))
 
-    return monkeys
+    return monkeys, divisors
 
 
 def part1(input):
-    monkeys = parse_input(input)
+    monkeys, _ = parse_input(input)
 
     for i in range(20):
         for monkey in monkeys:
             while monkey.has_next():
-                item, target = monkey.get_next()
-                # print(f'Monkey {monkey.monkey_id} throws item with worry level {item} to monkey {target}.')
+                item, target = monkey.get_next(reduce_worry=True)
                 monkeys[target].add_item(item)
 
     sorted_monkeys = sorted(monkeys)
@@ -96,7 +100,18 @@ def part1(input):
 
 
 def part2(input):
-    pass
+    monkeys, divisors = parse_input(input)
+    divisor_product = reduce(operator.mul, divisors, 1)
+    for i in range(10000):
+        if i % 100 == 0:
+            print(i)
+        for monkey in monkeys:
+            while monkey.has_next():
+                item, target = monkey.get_next(reduce_worry=False)
+                monkeys[target].add_item(item % divisor_product)
+
+    sorted_monkeys = sorted(monkeys)
+    return sorted_monkeys[-1].items_inspected * sorted_monkeys[-2].items_inspected
 
 
 if __name__ == '__main__':
