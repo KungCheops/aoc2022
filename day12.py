@@ -2,6 +2,7 @@ from helper.input import read_input_simple
 import sys
 import numpy as np
 from queue import Queue
+from matplotlib import pyplot as plt
 
 
 def create_map(input, all_starts = False):
@@ -57,20 +58,44 @@ def dijkstra(height_map, start, end, reverse=False):
             if not neighbor in visited:
                 to_visit.put((neighbor, path + [current]))
                 visited.add(neighbor)
-
     return
-        
+
+
+def path_to_map(path, height_map):
+    new_map = height_map.copy()
+    path_len = len(path)
+    print(path_len)
+    counter = 1
+    for x, y in path:
+        new_map[y][x] = 30 + ((20 * counter) // path_len)
+        counter += 1
+    print(new_map)
+    return new_map
+
+
+def plot_map_and_path(height_map, path):    
+    plt.subplot(1, 2, 1)
+    plt.imshow(height_map, interpolation='nearest')
+    plt.subplot(1, 2, 2)
+    plt.imshow(path_to_map(path, height_map))
+    plt.show()
 
 
 def part1(input):
     height_map, start, end = create_map(input)
     path = dijkstra(height_map, start, end)
+    
+    plot_map_and_path(height_map, path)
+    
     return len(path) - 1
 
 
 def part2(input):
     height_map, start, end = create_map(input, all_starts=True)
     path = dijkstra(height_map, end, start, reverse=True)
+    
+    plot_map_and_path(height_map, list(reversed(path)))
+
     return len(path) - 1
 
 
