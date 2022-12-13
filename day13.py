@@ -49,19 +49,7 @@ class Packet:
             
 
     def __repr__(self):
-        # if self.type == 'int':
-        #     return f'int:{self.value}'
         return str(self.value).replace(' ', '')
-
-    # def __lt__(self, other):
-    #     if self.type == 'int' and other.type == 'int':
-    #         return self.value < other.value
-    #     elif self.type == 'list' and other.type == 'list':
-    #         return all([l < r for l, r in zip(self.value, other.value)]) and len(self.value) <= len(other.value)
-    #     elif self.type == 'int':
-    #         return Packet('[' + str(self.value) + ']') < other
-    #     else:
-    #         return self < Packet('[' + str(other.value) + ']')
 
 
     def __lt__(self, other):
