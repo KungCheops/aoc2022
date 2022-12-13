@@ -21,6 +21,7 @@ class Packet:
 
 
     def __init__(self, string):
+        self.string = string
         if string[0] == '[':
             depth = 0
             matching_bracket = -1
@@ -68,6 +69,10 @@ class Packet:
             return self < Packet('[' + str(other.value) + ']')
 
 
+    def __eq__(self, other):
+        return self.string == other.string
+
+
 def part1(input):
     counter = 0
     for line_number, line in enumerate(read_input_simple(13, input)):
@@ -83,7 +88,13 @@ def part1(input):
 
 
 def part2(input):
-    pass
+    packets = [Packet(line) for line in read_input_simple(13, input) if line != '']
+    divider1 = Packet('[[2]]')
+    divider2 = Packet('[[6]]')
+    packets.append(divider1)
+    packets.append(divider2)
+    packets.sort()
+    return (packets.index(divider1) + 1) * (packets.index(divider2) + 1)
 
 
 if __name__ == '__main__':
