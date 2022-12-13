@@ -53,7 +53,6 @@ class Packet:
 
 
     def __lt__(self, other):
-        print(f'Compare {self} and {other}')
         if self.type == 'int' and other.type == 'int':
             return self.value < other.value
         elif self.type == 'list' and other.type == 'list':
@@ -62,7 +61,6 @@ class Packet:
                     return True
                 elif r < l:
                     return False
-            print(self.value, other.value, 'are the same')
             return len(self.value) < len(other.value)
         elif self.type == 'int':
             return Packet('[' + str(self.value) + ']') < other
@@ -79,14 +77,8 @@ def part1(input):
             case 1:
                 right_packet = Packet(line)
             case 2:
-                print(left_packet)
-                print(right_packet)
                 if left_packet < right_packet:
-                    print('correct order')
                     counter += line_number // 3 + 1
-                else:
-                    print('wrong order')
-                print()
     return counter
 
 
