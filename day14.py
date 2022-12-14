@@ -1,14 +1,22 @@
 from helper.input import read_input_simple
 import sys
+import numpy as np
+from matplotlib import pyplot as plt
 
 
 sand_spawn = (500, 0)
 
 
-def draw_map(rock, sand, bounds):
+def print_map(rock, sand, bounds):
     for y in range(bounds[2], bounds[3]):
         print(''.join(('+' if (x, y) == (sand_spawn[0], sand_spawn[1]) else '#' if (x, y) in rock else 'o' if (x, y) in sand else ' ') for x in range(bounds[0], bounds[1])))
     print()
+
+
+def draw_map(rock, sand, bounds):
+    arr = [[(3 if (x, y) == (sand_spawn[0], sand_spawn[1]) else 2 if (x, y) in rock else 1 if (x, y) in sand else 0) for x in range(bounds[0], bounds[1])] for y in range(bounds[2], bounds[3])]
+    plt.imshow(np.array(arr), interpolation='nearest')
+    plt.show()
 
 
 def update_bounds(x, y, bounds):    
@@ -77,7 +85,7 @@ def drop_sand(rock, bounds):
             sand.add((grain_x, grain_y))
             rock_sand.add((grain_x, grain_y))
             grains += 1
-            if grains % 100 == 0:
+            if grains % 10000 == 0:
                 draw_map(rock, sand, bounds)
                 print(grains)
             update_bounds(grain_x, grain_y, bounds)
