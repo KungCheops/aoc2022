@@ -70,7 +70,6 @@ def get_next_position(x, y, rock_sand):
 def drop_sand(rock, bounds):
     sand = set()
     rock_sand = rock.union(sand)
-    draw_map(rock, sand, bounds)
     grains = 0
 
     updated = True
@@ -85,14 +84,14 @@ def drop_sand(rock, bounds):
             sand.add((grain_x, grain_y))
             rock_sand.add((grain_x, grain_y))
             grains += 1
-            if grains % 10000 == 0:
-                draw_map(rock, sand, bounds)
-                print(grains)
+            # if grains % 1000 == 0:
+                # draw_map(rock, sand, bounds)
+                # print(grains)
             update_bounds(grain_x, grain_y, bounds)
             if (grain_x, grain_y) == sand_spawn:
                 break
 
-    draw_map(rock, sand, bounds)
+    # draw_map(rock, sand, bounds)
     return grains
 
 
