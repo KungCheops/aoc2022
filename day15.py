@@ -29,7 +29,7 @@ def part1(input):
     cant_contain.sort()
     merged_ranges = [cant_contain[0]]
     for i in range(1, len(cant_contain)):
-        if cant_contain[i][0] > merged_ranges[-1][1]:
+        if cant_contain[i][0] > merged_ranges[-1][1] + 1:
             merged_ranges.append(cant_contain[i])
         else:
             merged_ranges[-1][1] = max(cant_contain[i][1], merged_ranges[-1][1])
