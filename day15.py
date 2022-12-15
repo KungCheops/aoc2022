@@ -37,7 +37,33 @@ def part1(input):
 
 
 def part2(input):
-    pass
+    sensors = parse_input(input)
+    # bound = 20
+    bound = 4000000
+    ranges = []
+    for y_cutoff in range(bound + 1):
+        if y_cutoff % 100000 == 0:
+            print(f'{100.0 * y_cutoff / bound}%')
+        cant_contain = list()
+        for sx, sy, bx, by in sensors:
+            # print(f'Sensor at ({sx}, {sy}) with beacon at ({bx}, {by})')
+            d_sb = abs(sx - bx) + abs(sy - by)
+            d_sl = abs(sy - y_cutoff)
+            diff = d_sb - d_sl
+            if diff >= 0:
+                cant_contain.append([max(sx - diff, 0), min(sx + diff, bound)])
+        cant_contain.sort()
+        merged_ranges = [cant_contain[0]]
+        for i in range(1, len(cant_contain)):
+            if cant_contain[i][0] > merged_ranges[-1][1] + 1:
+                merged_ranges.append(cant_contain[i])
+            else:
+                merged_ranges[-1][1] = max(cant_contain[i][1], merged_ranges[-1][1])
+        ranges.append(merged_ranges)
+    for y, rang in enumerate(ranges):
+        if rang != [[0, bound]]:
+            x = rang[0][1] + 1
+            return y + x * 4000000
 
 
 if __name__ == '__main__':
