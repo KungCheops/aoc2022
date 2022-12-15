@@ -16,26 +16,24 @@ def parse_input(input):
 
 def part1(input):
     sensors = parse_input(input)
-    y_cutoff = 10
+    # y_cutoff = 10
     y_cutoff = 2000000
-    cant_contain = set()
+    cant_contain = list()
     for sx, sy, bx, by in sensors:
         # print(f'Sensor at ({sx}, {sy}) with beacon at ({bx}, {by})')
         d_sb = abs(sx - bx) + abs(sy - by)
         d_sl = abs(sy - y_cutoff)
         diff = d_sb - d_sl
         if diff >= 0:
-            for x in range(sx - diff, sx + diff + 1):
-                # print(f'Rules out ({x}, {y_cutoff})')
-                cant_contain.add(x)
-                # print('New size:', len(cant_contain))
-    for sx, sy, bx, by in sensors:
-        if sy == y_cutoff and sx in cant_contain:
-            cant_contain.remove(sx)
-        if by == y_cutoff and bx in cant_contain:
-            cant_contain.remove(bx)
-    # print(cant_contain)
-    return len(cant_contain)
+            cant_contain.append([sx - diff, sx + diff])
+    cant_contain.sort()
+    merged_ranges = [cant_contain[0]]
+    for i in range(1, len(cant_contain)):
+        if cant_contain[i][0] > merged_ranges[-1][1]:
+            merged_ranges.append(cant_contain[i])
+        else:
+            merged_ranges[-1][1] = max(cant_contain[i][1], merged_ranges[-1][1])
+    return sum([x2 - x1 for x1, x2 in merged_ranges])
 
 
 def part2(input):
