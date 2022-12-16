@@ -1,6 +1,7 @@
 from helper.input import read_input_simple
 import sys
 from queue import Queue
+import itertools
 
 
 def get_distance(start, end, graph):
@@ -94,6 +95,15 @@ def get_best_path(current, remaining_valves, distances, flow_rates, remaining_ti
         return memo[key]
 
 
+def all_valve_combinations(valves):
+    res_set = set()
+    for l in range(7, len(valves) // 2 + 1):
+        combis = set(itertools.combinations(valves,l))
+        for c in combis:
+            res_set.add((tuple(c), tuple(set(valves)-set(c))))
+    return res_set
+
+
 def part1(input):
     valves, flow_rate, distance_between = parse_input(input)
     best_path = get_best_path(valves[0], set(valves[1:]), distance_between, flow_rate, 30)
@@ -102,7 +112,22 @@ def part1(input):
 
 
 def part2(input):
-    pass
+    valves, flow_rate, distance_between = parse_input(input)
+    best_score = 0
+    best_path = None
+    all_combinations = all_valve_combinations(valves[1:])
+    number_of_combinations = len(all_combinations)
+    for i, (valves1, valves2) in enumerate(all_combinations):
+        print(f'Finding value for {valves1}, {valves2}: (progress: {i+1}/{number_of_combinations})')
+        best_path_len1, path1 = get_best_path('AA', set(valves1), distance_between, flow_rate, 26)
+        best_path_len2, path2 = get_best_path('AA', set(valves2), distance_between, flow_rate, 26)
+        value = best_path_len1 + best_path_len2
+        print(f'\t{best_path_len1}+{best_path_len2}={value}')
+        if value > best_score:
+            best_score = value
+            best_path = (path1, path2)
+    print(memo_used)
+    return best_score, best_path
 
 
 if __name__ == '__main__':
