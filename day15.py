@@ -18,14 +18,15 @@ def part1(input):
     sensors = parse_input(input)
     # y_cutoff = 10
     y_cutoff = 2000000
-    cant_contain = list()
+    ranges = list()
     for sx, sy, bx, by in sensors:
         # print(f'Sensor at ({sx}, {sy}) with beacon at ({bx}, {by})')
         d_sb = abs(sx - bx) + abs(sy - by)
         d_sl = abs(sy - y_cutoff)
         diff = d_sb - d_sl
         if diff >= 0:
-            cant_contain.append([sx - diff, sx + diff])
+            ranges.append([sx - diff, sx + diff])
+
     cant_contain.sort()
     merged_ranges = [cant_contain[0]]
     for i in range(1, len(cant_contain)):
