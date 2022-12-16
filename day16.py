@@ -14,7 +14,7 @@ def get_distance(start, end, graph):
         current, path = to_visit.get()
         if current == end or current in end:
             # print(f'\tis {len(path)}')
-            return len(path)
+            return len(path) + 1
         
         for neighbor in graph[current]:
             if not neighbor in visited:
@@ -66,7 +66,8 @@ def get_best_path(current, remaining_valves, distances, flow_rates, remaining_ti
         return value, []
     else:
         sorted_remaining = tuple(sorted(list(remaining_valves)))
-        key = (current, sorted_remaining, remaining_time)
+        sorted_open = tuple(sorted(list(open_valves)))
+        key = (current, sorted_remaining, sorted_open, remaining_time)
         if key in memo:
             memo_used[0] += 1
             return memo[key]
@@ -79,7 +80,7 @@ def get_best_path(current, remaining_valves, distances, flow_rates, remaining_ti
             new_remaining.remove(new)
             new_open = open_valves.copy()
             new_open.add(new)
-            distance = distances[(current, new)] + 1
+            distance = distances[(current, new)]
             new_remaining_time = max(remaining_time - distance, 0)
             # print(f'Try going from {current} to {new} ({distance} minute(s) away):')
             released_while_travelling = get_flow(open_valves, flow_rates, min(distance, remaining_time))
