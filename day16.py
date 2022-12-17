@@ -97,7 +97,7 @@ def get_best_path(current, remaining_valves, distances, flow_rates, remaining_ti
 
 def all_valve_combinations(valves):
     res_set = set()
-    for l in range(7, len(valves) // 2 + 1):
+    for l in range(1, len(valves) // 2 + 1):
         combis = set(itertools.combinations(valves,l))
         for c in combis:
             res_set.add((tuple(c), tuple(set(valves)-set(c))))
