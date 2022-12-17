@@ -82,40 +82,57 @@ def part1(input):
 def part2(input):
     height = 0
     game_map = set()
+    input_length = sum(len(line) for line in read_input_simple(17, input))
     wind_generator = enumerate(get_wind(input))
-    start_time = time.time_ns()
+    cycle_length = input_length * 5
 
-    for i, block in enumerate(itertools.islice(get_block(), n)):
-        if time.time_ns() - start_time >= 1000000000:
-            print(f'{100.0*i/n}%')
-            start_time += 1000000000
-        # print(block)
+    done = False
+    first_height, cycle_height, first_blocks, cycle_blocks = 0, 0, 0, 0
+    for block_index, block in enumerate(get_block()):
         x, y = 2, height + 3
-        # print(x, y)
-        # print(f'Block {block} spawned at point {(x, y)}')
         while True:
             j, wind = next(wind_generator)
-            if j % 10091 == 0:
+            if j == cycle_length:
                 print_map(game_map, height, 10)
-                print(height)
+                first_height = height
+                first_blocks = block_index
+            elif j == cycle_length * 2:
+                print_map(game_map, height, 10)
+                cycle_height = height - first_height
+                cycle_blocks = block_index - first_blocks
+                done = True
             if can_move(block, x, y, wind, 0, game_map):
                 x, y = move_block(x, y, wind, 0)
-                # print(f'\tWind pushes block to {(x, y)}')
-            # else:
-                # print(f'Got pushed into a wall')
             if not at_rest(block, x, y, game_map):
                 x, y = move_block(x, y, 0, -1)
-                # print(f'\tGravity pushes block to {(x, y)}')
             else:
-                # print(f'\tBlock landed at {(x, y)}')
                 for bx, by in block:
                     game_map.add((x + bx, y + by))
                 break
         height = max(height, max((y + by + 1 for _, by in block)))
-        # print_map(game_map, height)
-        # print(f'New height: {height}')
-        # print()
-    return height
+        if done:
+            break
+    full_cycles_needed = (1000000000000 - first_blocks) // cycle_blocks
+    blocks_remaining = (1000000000000 - first_blocks) % cycle_blocks
+
+    second_start_height = height
+
+    for block in itertools.islice(get_block(), blocks_remaining):
+        x, y = 2, height + 3
+        while True:
+            _, wind = next(wind_generator)
+            if can_move(block, x, y, wind, 0, game_map):
+                x, y = move_block(x, y, wind, 0)
+            if not at_rest(block, x, y, game_map):
+                x, y = move_block(x, y, 0, -1)
+            else:
+                for bx, by in block:
+                    game_map.add((x + bx, y + by))
+                break
+        height = max(height, max((y + by + 1 for _, by in block)))
+    print(height - second_start_height, height)
+
+    return first_height + cycle_height * full_cycles_needed + height - second_start_height
 
 
 if __name__ == '__main__':
