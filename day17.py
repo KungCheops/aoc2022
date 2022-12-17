@@ -10,7 +10,7 @@ def get_wind(input):
         for char in line:
             if char == '<':
                 yield -1
-            elif char =='>':
+            elif char == '>':
                 yield 1
 
 
