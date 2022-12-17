@@ -59,11 +59,35 @@ def print_map(game_map, height, only_top=-1):
 
 
 def height_after_n_blocks(input, n):
+
+
+def part1(input):
+    height = 0
+    game_map = set()
+    wind_generator = get_wind(input)
+
+    for block in itertools.islice(get_block(), 2022):
+        x, y = 2, height + 3
+        while True:
+            wind = next(wind_generator)
+            if can_move(block, x, y, wind, 0, game_map):
+                x, y = move_block(x, y, wind, 0)
+            if not at_rest(block, x, y, game_map):
+                x, y = move_block(x, y, 0, -1)
+            else:
+                for bx, by in block:
+                    game_map.add((x + bx, y + by))
+                break
+        height = max(height, max((y + by + 1 for _, by in block)))
+    return height
+
+
+def part2(input):
     height = 0
     game_map = set()
     wind_generator = enumerate(get_wind(input))
     start_time = time.time_ns()
-    
+
     for i, block in enumerate(itertools.islice(get_block(), n)):
         if time.time_ns() - start_time >= 1000000000:
             print(f'{100.0*i/n}%')
@@ -95,31 +119,6 @@ def height_after_n_blocks(input, n):
         # print(f'New height: {height}')
         # print()
     return height
-
-
-def part1(input):
-    height = 0
-    game_map = set()
-    wind_generator = get_wind(input)
-    
-    for i, block in enumerate(itertools.islice(get_block(), 2022)):
-        x, y = 2, height + 3
-        while True:
-            wind = next(wind_generator)
-            if can_move(block, x, y, wind, 0, game_map):
-                x, y = move_block(x, y, wind, 0)
-            if not at_rest(block, x, y, game_map):
-                x, y = move_block(x, y, 0, -1)
-            else:
-                for bx, by in block:
-                    game_map.add((x + bx, y + by))
-                break
-        height = max(height, max((y + by + 1 for _, by in block)))
-    return height
-
-
-def part2(input):
-    return height_after_n_blocks(input, 10000)
 
 
 if __name__ == '__main__':
