@@ -58,9 +58,6 @@ def print_map(game_map, height, only_top=-1):
     print('+-------+')
 
 
-def height_after_n_blocks(input, n):
-
-
 def part1(input):
     height = 0
     game_map = set()
