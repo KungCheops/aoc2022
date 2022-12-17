@@ -97,7 +97,6 @@ def part2(input):
         while True:
             j, wind = next(wind_generator)
             if j == cycle_length:
-                print_map(game_map, height)
                 first_height = height
                 first_blocks = block_index
             elif j == cycle_length * 2:
@@ -118,9 +117,8 @@ def part2(input):
             break
     full_cycles_needed = (total_blocks_to_drop - total_blocks_dropped) // cycle_blocks
     blocks_remaining = (total_blocks_to_drop - total_blocks_dropped) % cycle_blocks
-    print_map(game_map, height)
 
-    print(f'Summary:\n\tTotal blocks to drop: {total_blocks_to_drop}\n\tBlocks dropped: {total_blocks_dropped}\n\tBlocks dropped per cycle: {cycle_blocks}\n\tFull cycles needed: {full_cycles_needed}\n\tBlocks remaining: {blocks_remaining}\n\tHeight gained per cycle: {cycle_height}\n\tHeight before looping: {height}')
+    # print(f'Summary:\n\tTotal blocks to drop: {total_blocks_to_drop}\n\tBlocks dropped: {total_blocks_dropped}\n\tBlocks dropped per cycle: {cycle_blocks}\n\tFull cycles needed: {full_cycles_needed}\n\tBlocks remaining: {blocks_remaining}\n\tHeight gained per cycle: {cycle_height}\n\tHeight before looping: {height}')
 
     second_start_height = height
 
@@ -138,10 +136,7 @@ def part2(input):
                 break
         height = max(height, max((y + by + 1 for _, by in block)))
 
-    print(f'\tHeight after looping: {height}')
-
     print_map(game_map, height)
-    print(height - second_start_height, height)
 
     return cycle_height * full_cycles_needed + height
 
