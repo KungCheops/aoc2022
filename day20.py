@@ -9,19 +9,17 @@ def input_to_gen(input):
 
 def move(index, lst, indices):
     new_index = index + lst[index]
-    # print(f'Moving item {lst[index]} at index {index} to {new_index}')
     while new_index >= len(lst):
-        new_index -= (len(lst) - 1)
+        new_index = new_index % len(lst) + new_index // len(lst)
     while new_index < 0:
-        new_index += (len(lst) - 1)
+        new_index = new_index % len(lst) + new_index // len(lst)
     if new_index == 0:
         if index == 0:
-            return lst, index_lst
+            return lst, indices
         else:
             new_lst = lst[:index] + lst[index+1:] + [lst[index]]
             new_indices = [i - 1 if i > index else len(lst) - 1 if i == index else i for i in indices]
             return new_lst, new_indices
-    # print(f'\tUpdated index: {new_index}')
     if new_index > index:
         new_lst = lst[:index] + lst[index+1:new_index+1] + [lst[index]] + lst[new_index+1:]
         new_indices = [i - 1 if i > index and i <= new_index else new_index if i == index else i for i in indices]
@@ -34,35 +32,33 @@ def move(index, lst, indices):
         return lst[:], indices[:]
 
 
-def swap_items(lst):
+def mix(lst, times=1):
     indices = list(range(0, len(lst)))
-    print(lst)
 
-    # print(move(0, [1, 2, -3, 3, -2, 0, 4]), [2, 1, -3, 3, -2, 0, 4])
-    # print(move(0, [2, 1, -3, 3, -2, 0, 4]), [1, -3, 2, 3, -2, 0, 4])
-    # print(move(1, [1, -3, 2, 3, -2, 0, 4]), [1, 2, 3, -2, -3, 0, 4])
-    # print(move(2, [1, 2, 3, -2, -3, 0, 4]), [1, 2, -2, -3, 0, 3, 4])
-    # print(move(2, [1, 2, -2, -3, 0, 3, 4]), [1, 2, -3, 0, 3, 4, -2])
-    # print(move(3, [1, 2, -3, 0, 3, 4, -2]), [1, 2, -3, 0, 3, 4, -2])
-    # print(move(5, [1, 2, -3, 0, 3, 4, -2]), [1, 2, -3, 4, 0, 3, -2])
+    for _ in range(times):
+        for i in range(len(lst)):
+            to_swap_index = indices[i]
+            lst, indices = move(to_swap_index, lst, indices)
 
-    for i in range(len(lst)):
-        to_swap_index = indices[i]
-        lst, indices = move(to_swap_index, lst, indices)
-    print(lst)
-
-    index_of_zero = lst.index(0)
-    return [lst[(index_of_zero + i * 1000) % len(lst)] for i in range(1,4)]
+    return lst
 
 
 def part1(input):
     encrypted = list(input_to_gen(input))
-    items = swap_items(encrypted)
+    decrypted = mix(encrypted)
+    index_of_zero = decrypted.index(0)
+    items = [decrypted[(index_of_zero + i * 1000) % len(decrypted)] for i in range(1,4)]
     return sum(items)
 
 
 def part2(input):
-    pass
+    encrypted = list(input_to_gen(input))
+    decrypted = [i * 811589153 for i in encrypted]
+
+    decrypted = mix(decrypted, 10)
+    index_of_zero = decrypted.index(0)
+    items = [decrypted[(index_of_zero + i * 1000) % len(decrypted)] for i in range(1,4)]
+    return sum(items)
 
 
 if __name__ == '__main__':
