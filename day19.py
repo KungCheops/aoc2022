@@ -102,7 +102,7 @@ def part1(input):
 
 def part2(input):
     blueprints = parse_input(input)
-    ret = 0
+    ret = 1
     
     for blueprint_id, ore_ore, clay_ore, obs_ore, obs_clay, geo_ore, geo_obs in itertools.islice(blueprints, 3):
         # print(blueprint_id, ore_ore, clay_ore, obs_ore, obs_clay, geo_ore, geo_obs)
@@ -112,7 +112,7 @@ def part2(input):
         value, path = optimal_solution(32, (1, 0, 0, 0), (0, 0, 0, 0), (max_ore_robots, max_clay_robots, max_obs_robots), (ore_ore, clay_ore, obs_ore, obs_clay, geo_ore, geo_obs))
         print(blueprint_id, value)
         # [print(step) for step in reverse(path)]
-        ret += value * blueprint_id
+        ret *= value
     
     return ret
 
