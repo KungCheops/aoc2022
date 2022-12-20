@@ -13,13 +13,6 @@ def move(index, lst, indices):
         new_index = new_index % len(lst) + new_index // len(lst)
     while new_index < 0:
         new_index = new_index % len(lst) + new_index // len(lst)
-    if new_index == 0:
-        if index == 0:
-            return lst, indices
-        else:
-            new_lst = lst[:index] + lst[index+1:] + [lst[index]]
-            new_indices = [i - 1 if i > index else len(lst) - 1 if i == index else i for i in indices]
-            return new_lst, new_indices
     if new_index > index:
         new_lst = lst[:index] + lst[index+1:new_index+1] + [lst[index]] + lst[new_index+1:]
         new_indices = [i - 1 if i > index and i <= new_index else new_index if i == index else i for i in indices]
