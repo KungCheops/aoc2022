@@ -30,18 +30,17 @@ def parse_input(input):
 
 def evaluate(monkey, monkeys):
     val = monkeys[monkey]
-    if isinstance(val, int):
+    if type(val) in {int, complex, float, str}:
         return val
-    elif isinstance(val, str):
-        return val
-    else:
+    elif isinstance(val, tuple):
         op, m1, m2 = val
         v1 = evaluate(m1, monkeys)
         v2 = evaluate(m2, monkeys)
-        if not op == operator.eq:
+        if op == '=':
+            return (v1, v2)
+        if type(v1) in {int, complex, float} and type(v2) in {int, complex, float}:
             return op(v1, v2)
-        else:
-            return (str(op), v1, v2)
+        return (op, v1, v2)
 
 
 def part1(input):
@@ -55,29 +54,17 @@ def part1(input):
 def part2(input):
     monkeys = parse_input(input)
     op, m1, m2 = monkeys['root']
-    monkeys['root'] = (get_operator('='), m1, m2)
+    monkeys['root'] = ('=', m1, m2)
+    monkeys['humn'] = 1j
 
-    _, left1, right1 = evaluate('root', monkeys)
-    maxv = 100000000000000
-    minv = 0
-    currentv = (maxv + minv) // 2
-    monkeys['humn'] = currentv
-    _, left, right = evaluate('root', monkeys)
+    lhs, rhs = evaluate('root', monkeys)
 
-    op = operator.lt if left - right < left1 - right1 else operator.gt
-
-    while left != right and minv < maxv:
-        if op(left, right):
-            maxv = currentv
-            currentv = (maxv + minv) // 2
-            monkeys['humn'] = currentv
-        else:
-            minv = currentv
-            currentv = (maxv + minv) // 2
-            monkeys['humn'] = currentv
-        _, left, right = evaluate('root', monkeys)
-
-    return currentv
+    if isinstance(lhs, int):
+        real, im = rhs.real, rhs.imag
+        return (lhs - real) / im
+    else:
+        real, im = lhs.real, lhs.imag
+        return (rhs - real) / im
 
 
 if __name__ == '__main__':
