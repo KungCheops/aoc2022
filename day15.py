@@ -27,13 +27,13 @@ def part1(input):
         if diff >= 0:
             ranges.append([sx - diff, sx + diff])
 
-    cant_contain.sort()
-    merged_ranges = [cant_contain[0]]
-    for i in range(1, len(cant_contain)):
-        if cant_contain[i][0] > merged_ranges[-1][1] + 1:
-            merged_ranges.append(cant_contain[i])
+    ranges.sort()
+    merged_ranges = [ranges[0]]
+    for i in range(1, len(ranges)):
+        if ranges[i][0] > merged_ranges[-1][1] + 1:
+            merged_ranges.append(ranges[i])
         else:
-            merged_ranges[-1][1] = max(cant_contain[i][1], merged_ranges[-1][1])
+            merged_ranges[-1][1] = max(ranges[i][1], merged_ranges[-1][1])
     return sum([x2 - x1 for x1, x2 in merged_ranges])
 
 
