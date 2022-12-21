@@ -12,7 +12,9 @@ def get_operator(op_str):
         case '*':
             return operator.mul
         case '/':
-            return operator.floordiv
+            return operator.truediv
+        case '=':
+            return operator.eq
 
 
 def parse_input(input):
@@ -30,9 +32,16 @@ def evaluate(monkey, monkeys):
     val = monkeys[monkey]
     if isinstance(val, int):
         return val
+    elif isinstance(val, str):
+        return val
     else:
         op, m1, m2 = val
-        return op(evaluate(m1, monkeys), evaluate(m2, monkeys))
+        v1 = evaluate(m1, monkeys)
+        v2 = evaluate(m2, monkeys)
+        if not op == operator.eq:
+            return op(v1, v2)
+        else:
+            return (str(op), v1, v2)
 
 
 def part1(input):
@@ -44,7 +53,32 @@ def part1(input):
 
 
 def part2(input):
-    pass
+    monkeys = parse_input(input)
+    op, m1, m2 = monkeys['root']
+    monkeys['root'] = (get_operator('='), m1, m2)
+    # monkeys['humn'] = 3587651000000
+
+    # monkeys['humn'] = 0    
+    # _, left1, right1 = evaluate('root', monkeys)
+    maxv = 100000000000000
+    minv = 0
+    currentv = (maxv + minv) // 2
+    monkeys['humn'] = currentv
+    _, left, right = evaluate('root', monkeys)
+    while left != right and minv < maxv:
+        print(minv, maxv, currentv, left, right)
+        if left < right:
+            maxv = currentv
+            currentv = (maxv + minv) // 2
+            monkeys['humn'] = currentv
+        else:
+            minv = currentv
+            currentv = (maxv + minv) // 2
+            monkeys['humn'] = currentv
+        _, left, right = evaluate('root', monkeys)
+        # print(currentv, left, right)
+
+    return currentv
 
 
 if __name__ == '__main__':
