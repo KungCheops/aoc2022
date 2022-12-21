@@ -54,11 +54,19 @@ def inverse(op):
             return '*'
 
 
+def expr_to_str(expr):
+    if type(expr) in {int, str}:
+        return str(expr)
+    elif isinstance(expr, tuple):
+        op_str, a, b = expr
+        return f'({expr_to_str(a)} {op_str} {expr_to_str(b)})'
+
+
 def solve(lhs, rhs):
     if lhs == 'x':
         print(f'{lhs} = {rhs}')
         return rhs
-    print(f'{lhs} = {rhs} =>')
+    print(f'{expr_to_str(lhs)} = {expr_to_str(rhs)} =>')
 
     if isinstance(lhs, int):
         return solve(rhs, lhs)
