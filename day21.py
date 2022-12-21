@@ -56,18 +56,18 @@ def part2(input):
     monkeys = parse_input(input)
     op, m1, m2 = monkeys['root']
     monkeys['root'] = (get_operator('='), m1, m2)
-    # monkeys['humn'] = 3587651000000
 
-    # monkeys['humn'] = 0    
-    # _, left1, right1 = evaluate('root', monkeys)
+    _, left1, right1 = evaluate('root', monkeys)
     maxv = 100000000000000
     minv = 0
     currentv = (maxv + minv) // 2
     monkeys['humn'] = currentv
     _, left, right = evaluate('root', monkeys)
+
+    op = operator.lt if left - right < left1 - right1 else operator.gt
+
     while left != right and minv < maxv:
-        print(minv, maxv, currentv, left, right)
-        if left < right:
+        if op(left, right):
             maxv = currentv
             currentv = (maxv + minv) // 2
             monkeys['humn'] = currentv
@@ -76,7 +76,6 @@ def part2(input):
             currentv = (maxv + minv) // 2
             monkeys['humn'] = currentv
         _, left, right = evaluate('root', monkeys)
-        # print(currentv, left, right)
 
     return currentv
 
