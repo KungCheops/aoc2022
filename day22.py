@@ -40,14 +40,14 @@ def parse_input(input):
 def turn(dx, dy, direction):
     if direction == 'R':
         match dx, dy:
-            case 1, 0:
-                return 0, 1
-            case 0, 1:
-                return -1, 0
-            case -1, 0:
-                return 0, -1
-            case 0, -1:
-                return 1, 0
+            case x, 0:
+                return 0, x
+            case 0, x:
+                return -x, 0
+            case -x, 0:
+                return 0, -x
+            case 0, -x:
+                return x, 0
     if direction == 'L':
         match dx, dy:
             case 1, 0:
@@ -124,16 +124,17 @@ def part1(input):
     return 1000 * (y + 1) + 4 * (x + 1) + facing(dx, dy)
 
 
-#                  Nor, Eas, Sou, Wes
-neighbors = {'U': ['F', 'R', 'N', 'L'],\
-             'N': ['U', 'R', 'D', 'L'],\
-             'R': ['U', 'F', 'D', 'N'],\
-             'F': ['U', 'L', 'D', 'R'],\
-             'L': ['U', 'N', 'D', 'F'],\
-             'D': ['N', 'R', 'F', 'L']}
+#                  Eas, Sou, Wes, Nor
+neighbors = {'U': ['R', 'N', 'L', 'F'],\
+             'N': ['R', 'D', 'L', 'U'],\
+             'R': ['F', 'D', 'N', 'U'],\
+             'F': ['L', 'D', 'R', 'U'],\
+             'L': ['N', 'D', 'F', 'U'],\
+             'D': ['R', 'F', 'L', 'N']}
 
 
 def rotate(dx, dy, rotation):
+    rotation = rotation % 4
     if rotation == 0:
         return dx, dy
     if rotation == 1:
@@ -149,7 +150,7 @@ def neighboring_sides(side, sides, rotation):
     print('Neighbors of', side, rotation)
     index, letter = side
     x, y = index
-    for i, (dx, dy) in enumerate([rotate(dx, dy, rotation) for dx, dy in [(0, -1), (1, 0), (0, 1), (-1, 0)]]):
+    for i, (dx, dy) in enumerate([rotate(dx, dy, rotation) for dx, dy in [(1, 0), (0, 1), (-1, 0), (0, -1)]]):
         # print(x, dx, y, dy, x + dx, y + dy)
         if (x + dx, y + dy) in sides:
             print(f'\t{x + dx}, {y + dy}, {neighbors[letter][i]}')
@@ -183,23 +184,6 @@ def get_rotation(side1, side2):
         case ('F', 'D'):
             return 2
     return -get_rotation(side2, side1)
-
-
-def move2(x, y, dx, dy, d, side_letter, sides):
-    for _ in range(d):
-        x += dx
-        y += dy
-        print(x, y)
-        if not (x, y) in sides[side_letter]:
-            return x, y, side_letter
-            newx, newy = find_on_new_side(x, y, dx, dy, world)
-            if world[(newx, newy)] == 1:
-                return x - dx, y - dy
-            else:
-                x, y = newx, newy
-        elif side[(x, y)] == 1:
-            return x - dx, y - dy, side_letter
-    return x, y, side_letter
 
 
 def parse_input2(input):
@@ -254,6 +238,34 @@ def parse_input2(input):
     return sides, sides_map, size, parse_instructions(next(line_gen))
 
 
+# Return x, y, dx, dy, rotation, side_letter
+def move2(x, y, dx, dy, rotation, d, side_letter, sides):
+    if d == 0:
+        return x, y, dx, dy, rotation, side_letter
+    elif (x + dx, y + dy) in sides[side_letter]:
+        if sides[side_letter][(x + dx, x + dy)] == 1:
+            return x, y, dx, dy, rotation, side_letter
+        else:
+            return move2(x + dx, y + dy, dx, dy, rotation, d - 1, side_letter, sides)
+    else:
+        direction = (facing(dx, dy) + rotation) % 4
+        print(direction)
+        new_letter = neighbors[side_letter][direction]
+        print(new_letter)
+        new_rotation = (rotation - get_rotation(side_letter, new_letter)) % 4
+        print(new_rotation)
+        new_side = sides[new_letter]
+        print(new_side)
+        
+        print('New side:', sides[new_letter])
+        newdx, newdy = rotate(dx, dy, new_rotation)
+        print(newdx, newdy)
+        newx, newy = rotate(x, y, new_rotation)
+        if sides[new_letter][(newx, newy)] == 1:
+            return x, y, dx, dy, rotation, side_letter
+        else:
+            return newx, newy, newdx, newdy, new_rotation, new_letter
+
 
 def part2(input):
     sides, sides_map, size, instructions = parse_input2(input)
@@ -263,7 +275,7 @@ def part2(input):
     side_index = sides_map['U']
     
     # test
-    move2(0, 0, -1, 0, 1, 'U', sides_map)
+    print(move2(0, 4, -1, 0, 0, 1, 'U', sides_map), (4, 0, 0, 1, 'L'))
     
 
     for instruction, arg in instructions:
