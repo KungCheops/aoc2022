@@ -126,7 +126,6 @@ def part1(input):
 def part2(input):
     elves = set(elf_positions(input))
     moved = set()
-    draw_map(elves, moved=moved)
     turn = 0
     while True:
         desired_positions = get_desired_positions(elves, turn)
@@ -137,7 +136,6 @@ def part2(input):
             break
         else:
             elves = new_elves
-    moved = set()
     draw_map(elves, block=True)
     return turn
 
