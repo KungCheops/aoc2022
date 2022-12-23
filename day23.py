@@ -116,12 +116,10 @@ def part2(input):
         for elf in elves:
             x, y = elf
             newx, newy = x, y
-            moved = False
             if any_neighbor(x, y, elves):
                 for direction in range(4):
                     if check_direction(x, y, direction + turn, elves):
                         newx, newy = get_new_position(x, y, direction + turn)
-                        moved = True
                         break
             desired_position[(newx, newy)].add((x, y))
         turn += 1
