@@ -11,7 +11,6 @@ def elf_positions(input):
 
 
 def check_direction(x, y, direction, other_elves):
-    direction %= 4
     if direction == 0:
         return not any((x + dx, y - 1) in other_elves for dx in range(-1, 2))
     if direction == 1:
@@ -31,7 +30,6 @@ def any_neighbor(x, y, elves):
 
 
 def get_new_position(x, y, direction):
-    direction %= 4
     if direction == 0:
         return x, y - 1
     if direction == 1:
@@ -62,7 +60,32 @@ def get_bounds(elves):
     miny = min(y for (_, y) in elves)
     maxy = max(y for (_, y) in elves)
     return (minx, maxx, miny, maxy)
-    
+
+
+def get_desired_positions(elves, turn):
+    desired_positions = defaultdict(list)
+    for elf in elves:
+        x, y = elf
+        newx, newy = x, y
+        if any_neighbor(x, y, elves):
+            for direction in range(4):
+                new_direction = (direction + turn % 4)
+                if check_direction(x, y, new_direction, elves):
+                    newx, newy = get_new_position(x, y, new_direction)
+                    break
+        desired_positions[(newx, newy)].append((x, y))
+    return desired_positions
+
+
+def get_new_positions(desired_positions):
+    elves = set()
+    for new_position, old_positions in desired_positions.items():
+        if len(old_positions) > 1:
+            for position in old_positions:
+                elves.add(position)
+        else:
+            elves.add(new_position)
+    return elves
 
 
 def print_map(elves, bounds=None):
@@ -73,35 +96,12 @@ def print_map(elves, bounds=None):
     print()
 
 
-def draw_map(elves, bounds=None):
-    if not bounds:
-        bounds = get_bounds(elves)
-    arr = [[(1 if (x, y) in elves else 0) for x in range(bounds[0], bounds[1] + 1)] for y in range(bounds[2], bounds[3] + 1)]
-    plt.imshow(np.array(arr), interpolation='nearest')
-    plt.show()
-
-
 def part1(input):
     elves = set(elf_positions(input))
     for turn in range(10):
         # print_map(elves)
-        desired_position = defaultdict(set)
-        for elf in elves:
-            x, y = elf
-            newx, newy = x, y
-            if any_neighbor(x, y, elves):
-                for direction in range(4):
-                    if check_direction(x, y, direction + turn, elves):
-                        newx, newy = get_new_position(x, y, direction + turn)
-                        break
-            desired_position[(newx, newy)].add((x, y))
-        elves = set()
-        for new_position, old_positions in desired_position.items():
-            if len(old_positions) > 1:
-                for position in old_positions:
-                    elves.add(position)
-            else:
-                elves.add(new_position)
+        desired_positions = get_desired_positions(elves, turn)
+        elves = get_new_positions(desired_positions)
     # print_map(elves, bounds)
     minx, maxx, miny, maxy = get_bounds(elves)
     return (maxx + 1 - minx) * (maxy + 1 - miny) - len(elves)
@@ -112,24 +112,9 @@ def part2(input):
     turn = 0
     while True:
         # print_map(elves)
-        desired_position = defaultdict(set)
-        for elf in elves:
-            x, y = elf
-            newx, newy = x, y
-            if any_neighbor(x, y, elves):
-                for direction in range(4):
-                    if check_direction(x, y, direction + turn, elves):
-                        newx, newy = get_new_position(x, y, direction + turn)
-                        break
-            desired_position[(newx, newy)].add((x, y))
+        desired_positions = get_desired_positions(elves, turn)
         turn += 1
-        new_elves = set()
-        for new_position, old_positions in desired_position.items():
-            if len(old_positions) > 1:
-                for position in old_positions:
-                    new_elves.add(position)
-            else:
-                new_elves.add(new_position)
+        new_elves = get_new_positions(desired_positions)
         if new_elves == elves:
             break
         else:
