@@ -6,8 +6,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def parse_input(input):
-    all_lines = list(read_input_simple(24, input))
+def parse_input(input_file):
+    all_lines = list(read_input_simple(24, input_file))
     width = len(all_lines[0])
     height = len(all_lines)
     inner_width = width - 2
@@ -94,22 +94,17 @@ def draw_map(blizzard_locations, turn, width, height, my_position=None, block=Fa
     plt.clf()
 
 
-def part1(input):
-    start, end, width, height, blizzard_locations = parse_input(input)
-    ends = list()
-    ends.append(end)
+def part1(input_file):
+    start, end, width, height, blizzard_locations = parse_input(input_file)
     path = dijkstra(width, height, start, [end], blizzard_locations)
-    # for i, pos in enumerate(path):
-        # print(i, pos)
-        # print_map(blizzard_locations, i, width, height, pos)
     return len(path) - 1
 
 
-def part2(input):
-    start, end, width, height, blizzard_locations = parse_input(input)
+def part2(input_file):
+    start, end, width, height, blizzard_locations = parse_input(input_file)
     path = dijkstra(width, height, start, [end, start, end], blizzard_locations)
+    input('Path calculated')
     for i, pos in enumerate(path):
-        # print(i, pos)
         # print_map(blizzard_locations, i, width, height, pos)
         draw_map(blizzard_locations, i, width, height, pos)
     draw_map(blizzard_locations, i, width, height, end, block=True)
@@ -117,10 +112,10 @@ def part2(input):
 
 
 if __name__ == '__main__':
-    _, part, input = sys.argv
+    _, part, input_file = sys.argv
     if part == '1':
-        print(part1(input))
+        print(part1(input_file))
     elif part == '2':
-        print(part2(input))
+        print(part2(input_file))
     else:
         print('Part must be one of 1 or 2')
