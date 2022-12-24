@@ -53,7 +53,7 @@ def dijkstra(width, height, start, ends, blizzard_locations):
     to_visit.put((initial_state, []))
     visited = set()
     visited.add(initial_state)
-    
+
     while not to_visit.empty():
         state, path = to_visit.get()
         position, turn, next_checkpoint = state
@@ -61,7 +61,7 @@ def dijkstra(width, height, start, ends, blizzard_locations):
             next_checkpoint += 1
             if next_checkpoint >= len(ends):
                 return path + [position]
-        
+
         for neighbor in neighboring_cells(position, width, height, start, ends[0], blizzard_locations, turn + 1):
             new_state = (neighbor, (turn + 1) % cycle_time, next_checkpoint)
             if not new_state in visited:
