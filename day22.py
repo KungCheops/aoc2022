@@ -108,15 +108,6 @@ def part1(input):
     return 1000 * (y + 1) + 4 * (x + 1) + facing(dx, dy)
 
 
-#                  Eas, Sou, Wes, Nor
-neighbors = {'U': ['R', 'N', 'L', 'F'],\
-             'N': ['R', 'D', 'L', 'U'],\
-             'R': ['F', 'D', 'N', 'U'],\
-             'F': ['L', 'D', 'R', 'U'],\
-             'L': ['N', 'D', 'F', 'U'],\
-             'D': ['R', 'F', 'L', 'N']}
-
-
 def rotate(dx, dy, rotation):
     rotation = rotation % 4
     if rotation == 0:
@@ -130,48 +121,8 @@ def rotate(dx, dy, rotation):
         return turn(dx1, dx2, 'R')
 
 
-def neighboring_sides(side, sides, rotation):
-    # print('Neighbors of', side, rotation)
-    index, letter = side
-    x, y = index
-    for i, (dx, dy) in enumerate([rotate(dx, dy, rotation) for dx, dy in [(1, 0), (0, 1), (-1, 0), (0, -1)]]):
-        # print(x, dx, y, dy, x + dx, y + dy)
-        if (x + dx, y + dy) in sides:
-            # print(f'\t{x + dx}, {y + dy}, {neighbors[letter][i]}')
-            yield x + dx, y + dy, neighbors[letter][i]
-
-
-def get_rotation(side1, side2):
-    match (side1, side2):
-        case ('U', 'R'):
-            return -1
-        case ('U', 'N'):
-            return 0
-        case ('U', 'L'):
-            return 1
-        case ('U', 'F'):
-            return 2
-        case ('R', 'F'):
-            return 0
-        case ('R', 'N'):
-            return 0
-        case ('R', 'D'):
-            return -1
-        case ('L', 'N'):
-            return 0
-        case ('L', 'F'):
-            return 0
-        case ('L', 'D'):
-            return 1
-        case ('N', 'D'):
-            return 0
-        case ('F', 'D'):
-            return 2
-    return -get_rotation(side2, side1)
-
-
 def parse_input2(input):
-    sides = defaultdict(dict)
+    world = dict()
 
     line_gen = read_input_simple(22, input, False)
 
@@ -179,97 +130,72 @@ def parse_input2(input):
     width = max(len(list(line)) for line in lines[:-2])
     height = len(lines) - 2
     size = int(math.sqrt(width * height / 12))
+    start = None
 
     y = 0
-    up = None
     while (line := next(line_gen)) != '':
         for x, c in enumerate(line):
             if c in {'#', '.'}:
                 side_index = (x // size, y // size)
+                position = (x % size, y % size, side_index)
                 if c == '#':
-                    sides[side_index][(x % size, y % size)] = 1
+                    world[position] = 1
                 else:
-                    sides[side_index][(x % size, y % size)] = 0
-                if not up:
-                    up = side_index
+                    world[position] = 0
+                if not start:
+                    start = position
         y += 1
 
-    # sides_map: key='U', value=((2, 1), 0)=(side_index, rotation)
-    sides_map = dict()
-    to_visit = Queue()
-    to_visit.put(((up, 'U'), []))
-    visited = set()
-    visited.add('U')
-    while not to_visit.empty():
-        current, previous = to_visit.get()
-        current_index, current_letter = current
-
-        if not previous:
-            rotation = 0
-            sides_map[current_letter] = (current_index, rotation)
-        else:
-            prev_index, prev_letter, prev_rotation = previous
-            prev_x, prev_y = prev_index
-            rotation = (prev_rotation + get_rotation(prev_letter, current_letter)) % 4
-            sides_map[current_letter] = (current_index, rotation)
-        for nx, ny, nletter in neighboring_sides(current, sides.keys(), rotation):
-            if not nletter in visited:
-                to_visit.put((((nx, ny), nletter), (current_index, current_letter, rotation)))
-                visited.add(nletter)
-
-    # print(sides_map)
-
-    return sides, sides_map, size, parse_instructions(next(line_gen))
+    return world, size, start, parse_instructions(next(line_gen))
 
 
-# Return x, y, dx, dy, rotation, side_letter
-def move2(x, y, dx, dy, rotation, d, side_letter, sides_map, sides):
+def get_new_dxdy_and_side(x, y, dx, dy, side_index, size):
+    match dx, dy, side_index:
+        #   return x, y, dx, dy, side_index
+        case 1, 0, (1, 0):
+            return 0, y, 1, 0, (2, 0)
+        case 0, 1, (1, 0):
+            return x, 0, 0, 1, (1, 1)
+        case -1, 0, (1, 0):
+            return 0, size - y - 1, 1, 0, (0, 2)
+        case 0, -1, (1, 0):
+            return 0, x, 1, 0, (0, 3)
+        case 1, 0, (2, 0):
+            return size - 1, -y, -1, 0, (0, 2)
+        case 0, 1, (2, 0):
+            return size - 1, x, -1, 0, (1, 1)
+        case -1, 0, (2, 0):
+            return size - 1, y, -1, 0, (1, 0)
+
+
+# Return: x, y, side_index, dx, dy
+def move2(x, y, side_index, dx, dy, d, world, size):
     if d == 0:
-        return x, y, dx, dy, rotation, side_letter
-    elif (x + dx, y + dy) in sides[side_letter]:
-        if sides[side_letter][(x + dx, x + dy)] == 1:
-            return x, y, dx, dy, rotation, side_letter
+        return x, y, side_index, dx, dy
+    elif (x + dx, y + dy, side_index) in world:
+        if world[(x + dx, y + dy, side_index)] == 1:
+            return x, y, side_index, dx, dy
         else:
-            return move2(x + dx, y + dy, dx, dy, rotation, d - 1, side_letter, sides_map, sides)
+            return move2(x + dx, y + dy, side_index, dx, dy, d - 1, world)
     else:
-        direction = (facing(dx, dy) + rotation) % 4
-        # print(direction)
-        new_letter = neighbors[side_letter][direction]
-        # print(new_letter)
-        new_rotation = (rotation - get_rotation(side_letter, new_letter)) % 4
-        # print(new_rotation)
-        new_side = sides[new_letter]
-        # print(new_side)
-        
-        # print('New side:', sides[new_letter])
-        newdx, newdy = rotate(dx, dy, new_rotation)
-        # print(newdx, newdy)
-        newx, newy = rotate(x, y, new_rotation)
-        # print(newx, newy)
-        new_side_index, new_side_rotation = sides_map[new_letter]
-        # print(sides[new_side_index])
-        if sides[new_side_index][(newx, newy)] == 1:
-            return x, y, dx, dy, rotation, side_letter
+        new_x, new_y, new_dx, new_dy, new_side_index = get_new_dxdy_and_side(x, y, dx, dy, side_index, size)
+
+        if world[(new_x, new_y, new_side_index)] == 1:
+            return x, y, side_index, dx, dy
         else:
-            return move2(newx, newy, newdx, newdy, new_rotation, d - 1, new_letter, sides_map, sides)
+            return move2(newx, newy, new_side_index, new_dx, new_dy, d - 1, world, size)
 
 
 def part2(input):
-    sides, sides_map, size, instructions = parse_input2(input)
-    x, y, rotation = 0, 0, 0
+    world, size, start, instructions = parse_input2(input)
+    x, y, side_index = start
     dx, dy = 1, 0
-    side_letter = 'U'
-    side_index = sides_map['U']
-    # test
-    print(move2(0, 2, -1, 0, 0, 1, 'U', sides_map, sides), (2, 0, 0, 1, 3, 'L'))
-    print(move2(3, 2, 1, 0, 0, 1, 'U', sides_map, sides), (0, 2, 0, 1, 3, 'R'))
-    
-    return
+
     for instruction, arg in instructions:
         if instruction == 'turn':
             dx, dy = turn(dx, dy, arg)
         elif instruction == 'forward':
-            x, y, dx, dy, rotation, side_letter = move2(x, y, dx, dy, rotation, arg, side_letter, sides_map, sides)
+            x, y, side_index, dx, dy = move2(x, y, side_index, dx, dy, arg, world, size)
     return 1000 * (y + 1) + 4 * (x + 1) + facing(dx, dy)
 
 
