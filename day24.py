@@ -90,7 +90,7 @@ def draw_map(blizzard_locations, turn, width, height, my_position=None, block=Fa
              0) for x in range(-1, width + 1)] for y in range(-1, height + 1)]
     plt.imshow(np.array(arr), interpolation='nearest')
     plt.show(block=block)
-    plt.pause(0.1)
+    plt.pause(0.02)
     plt.clf()
 
 
