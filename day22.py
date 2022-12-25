@@ -151,7 +151,6 @@ def parse_input2(input):
 
 def get_new_dxdy_and_side(x, y, dx, dy, side_index, size):
     match dx, dy, side_index:
-        #   return x, y, dx, dy, side_index
         case 1, 0, (1, 0):
             return 0, y, 1, 0, (2, 0)
         case 0, 1, (1, 0):
@@ -161,14 +160,48 @@ def get_new_dxdy_and_side(x, y, dx, dy, side_index, size):
         case 0, -1, (1, 0):
             return 0, x, 1, 0, (0, 3)
         case 1, 0, (2, 0):
-            return size - 1, -y, -1, 0, (0, 2)
+            return size - 1, size - y - 1, -1, 0, (1, 2)
         case 0, 1, (2, 0):
             return size - 1, x, -1, 0, (1, 1)
         case -1, 0, (2, 0):
             return size - 1, y, -1, 0, (1, 0)
+        case 0, -1, (2, 0):
+            # maybe wrong?
+            return x, size - 1, 0, -1, (0, 3)
+        case 1, 0, (1, 1):
+            return y, size - 1, 0, -1, (2, 0)
+        case 0, 1, (1, 1):
+            return x, 0, 0, 1, (1, 2)
+        case -1, 0, (1, 1):
+            return y, 0, 0, 1, (0, 2)
+        case 0, -1, (1, 1):
+            return x, size - 1, 0, -1, (1, 0)
+        case 1, 0, (0, 2):
+            return 0, y, 1, 0, (1, 2)
+        case 0, 1, (0, 2):
+            return x, 0, 0, 1, (0, 3)
+        case -1, 0, (0, 2):
+            return 0, size - y - 1, 1, 0, (1, 0)
+        case 0, -1, (0, 2):
+            return 0, x, 1, 0, (1, 1)
+        case 1, 0, (1, 2):
+            return size - 1, size - y - 1, -1, 0, (2, 0)
+        case 0, 1, (1, 2):
+            return size - 1, x, -1, 0, (0, 3)
+        case -1, 0, (1, 2):
+            return size - 1, y, -1, 0, (0, 2)
+        case 0, -1, (1, 2):
+            return x, size - 1, 0, -1, (1, 1)
+        case 1, 0, (0, 3):
+            return y, size - 1, 0, -1, (1, 2)
+        case 0, 1, (0, 3):
+            return x, 0, 0, 1, (2, 0)
+        case -1, 0, (0, 3):
+            return y, 0, 0, 1, (1, 0)
+        case 0, -1, (0, 3):
+            return x, size - 1, 0, -1, (0, 2)
 
 
-# Return: x, y, side_index, dx, dy
 def move2(x, y, side_index, dx, dy, d, world, size):
     if d == 0:
         return x, y, side_index, dx, dy
@@ -176,14 +209,14 @@ def move2(x, y, side_index, dx, dy, d, world, size):
         if world[(x + dx, y + dy, side_index)] == 1:
             return x, y, side_index, dx, dy
         else:
-            return move2(x + dx, y + dy, side_index, dx, dy, d - 1, world)
+            return move2(x + dx, y + dy, side_index, dx, dy, d - 1, world, size)
     else:
         new_x, new_y, new_dx, new_dy, new_side_index = get_new_dxdy_and_side(x, y, dx, dy, side_index, size)
 
         if world[(new_x, new_y, new_side_index)] == 1:
             return x, y, side_index, dx, dy
         else:
-            return move2(newx, newy, new_side_index, new_dx, new_dy, d - 1, world, size)
+            return move2(new_x, new_y, new_side_index, new_dx, new_dy, d - 1, world, size)
 
 
 def part2(input):
@@ -196,7 +229,9 @@ def part2(input):
             dx, dy = turn(dx, dy, arg)
         elif instruction == 'forward':
             x, y, side_index, dx, dy = move2(x, y, side_index, dx, dy, arg, world, size)
-    return 1000 * (y + 1) + 4 * (x + 1) + facing(dx, dy)
+    global_x = x + side_index[0] * size
+    global_y = y + side_index[1] * size
+    return 1000 * (global_y + 1) + 4 * (global_x + 1) + facing(dx, dy)
 
 
 if __name__ == '__main__':
